@@ -4,27 +4,6 @@
 
 import { useEffect, useState } from "react";
 
-const storageKey = "social-profile";
-
-function saveProfile(profile) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(profile));
-  } catch (error) {
-    console.error("Error saving profile", error);
-  }
-}
-
-function getStoredProfile() {
-  if (typeof window === "undefined") return null;
-  try {
-    const raw = localStorage.getItem(storageKey);
-    return raw ? JSON.parse(raw) : null;
-  } catch (error) {
-    console.error("Error reading profile", error);
-    return null;
-  }
-}
-
 export default function ProfilePage() {
   const [profile, setProfile] = useState(null);
   const [form, setForm] = useState({
@@ -34,17 +13,35 @@ export default function ProfilePage() {
   });
   const [fileKey, setFileKey] = useState(0);
   const [message, setMessage] = useState("");
+  const [error, setError] = useState("");
+  const [loading, setLoading] = useState(true);
+  const [saving, setSaving] = useState(false);
 
   useEffect(() => {
-    const stored = getStoredProfile();
-    if (stored) {
-      setProfile(stored);
-      setForm({
-        name: stored.name || "",
-        bio: stored.bio || "",
-        photoData: stored.photo || "",
-      });
-    }
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/profile", { cache: "no-store" });
+        const data = await response.json();
+        if (!cancelled && data.profile) {
+          setProfile(data.profile);
+          setForm({
+            name: data.profile.name || "",
+            bio: data.profile.bio || "",
+            photoData: data.profile.photo || "",
+          });
+        }
+      } catch (err) {
+        console.error("Error loading profile", err);
+        if (!cancelled) setError("Could not load your profile yet.");
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
   }, []);
 
   const handlePhotoChange = (e) => {
@@ -60,21 +57,34 @@ export default function ProfilePage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
+    setError("");
+    setMessage("");
     if (!form.name) {
-      setMessage("Please add your name before saving.");
+      setError("Please add your name before saving.");
       return;
     }
-    const nextProfile = {
-      name: form.name,
-      bio: form.bio,
-      photo: form.photoData,
-    };
-    setProfile(nextProfile);
-    saveProfile(nextProfile);
-    setMessage("Profile saved. Check the preview below.");
-    setFileKey((k) => k + 1);
+    setSaving(true);
+    try {
+      const response = await fetch("/api/profile", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Unable to save profile.");
+      }
+      setProfile(data.profile);
+      setMessage("Profile saved. Check the preview below.");
+      setFileKey((k) => k + 1);
+    } catch (err) {
+      console.error("Error saving profile", err);
+      setError(err.message || "Unable to save profile.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   return (
@@ -87,7 +97,7 @@ export default function ProfilePage() {
             </p>
             <h1 className="text-3xl font-bold text-slate-900">Create your profile</h1>
             <p className="text-sm text-slate-600">
-              Add your details and a photo. Saved info appears in the preview and can be used for future posts.
+              Add your details and a photo. Saved info appears in the preview and is stored in Cloudinary for reuse.
             </p>
           </div>
 
@@ -137,11 +147,13 @@ export default function ProfilePage() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              disabled={saving}
+              className="w-full rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Save profile
+              {saving ? "Saving..." : "Save profile"}
             </button>
             {message ? <p className="text-sm text-emerald-700">{message}</p> : null}
+            {error ? <p className="text-sm text-rose-600">{error}</p> : null}
           </form>
         </section>
 
@@ -149,10 +161,12 @@ export default function ProfilePage() {
           <div className="flex items-center justify-between">
             <h2 className="text-2xl font-bold text-slate-900">Profile preview</h2>
             <span className="rounded-full bg-slate-200 px-3 py-1 text-xs font-semibold text-slate-600">
-              Saved locally
+              Saved remotely
             </span>
           </div>
-          {profile ? (
+          {loading ? (
+            <p className="text-sm text-slate-500">Loading profile…</p>
+          ) : profile ? (
             <div className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
               <div className="flex items-start gap-4">
                 {profile.photo ? (

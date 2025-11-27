@@ -2,16 +2,8 @@
 
 /* eslint-disable @next/next/no-img-element */
 
-import { useMemo, useState } from "react";
-
-const storageKey = "social-posts";
-
-const moodTone = {
-  Community: "bg-emerald-50 text-emerald-700 border-emerald-100",
-  Advice: "bg-sky-50 text-sky-700 border-sky-100",
-  Lifestyle: "bg-amber-50 text-amber-700 border-amber-100",
-  Update: "bg-indigo-50 text-indigo-700 border-indigo-100",
-};
+import { useEffect, useState } from "react";
+import { SocialCard } from "@/components/social-card";
 
 function classNames(...classes) {
   return classes.filter(Boolean).join(" ");
@@ -32,7 +24,7 @@ function ToastStack({ toasts, onDismiss }) {
             ✓
           </div>
           <div className="flex-1">
-            <p className="font-semibold text-emerald-700">Update posted</p>
+            <p className="font-semibold text-emerald-700">Update</p>
             <p className="text-slate-600">{toast.message}</p>
           </div>
           <button
@@ -48,77 +40,10 @@ function ToastStack({ toasts, onDismiss }) {
   );
 }
 
-function Avatar({ name }) {
-  const initials = useMemo(() => {
-    return name
-      .split(" ")
-      .map((n) => n[0])
-      .join("")
-      .slice(0, 2)
-      .toUpperCase();
-  }, [name]);
-
-  return (
-    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-gradient-to-br from-emerald-500 to-emerald-700 text-sm font-semibold text-white shadow-sm">
-      {initials}
-    </div>
-  );
-}
-
-function SocialCard({ post }) {
-  const tone = moodTone[post.mood] || "bg-slate-50 text-slate-700 border-slate-200";
-
-  return (
-    <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-4">
-        {post.photo ? (
-          <img
-            src={post.photo}
-            alt={post.user}
-            className="h-11 w-11 rounded-full object-cover ring-2 ring-emerald-200"
-          />
-        ) : (
-          <Avatar name={post.user} />
-        )}
-        <div className="flex-1 space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold text-slate-900">{post.title}</h3>
-            <span className={classNames("rounded-full border px-3 py-1 text-xs font-medium", tone)}>
-              {post.mood}
-            </span>
-          </div>
-          <p className="text-sm text-slate-600">
-            {post.user} <span className="text-slate-400">{post.handle}</span>
-          </p>
-          <p className="text-xs text-slate-400">{post.time}</p>
-        </div>
-      </div>
-      <p className="mt-4 text-base leading-relaxed text-slate-700">{post.content}</p>
-    </article>
-  );
-}
-
-function savePosts(posts) {
-  try {
-    localStorage.setItem(storageKey, JSON.stringify(posts));
-  } catch (error) {
-    console.error("Error saving posts", error);
-  }
-}
-
-function getStoredPosts() {
-  if (typeof window === "undefined") return [];
-  try {
-    const raw = localStorage.getItem(storageKey);
-    return raw ? JSON.parse(raw) : [];
-  } catch (error) {
-    console.error("Error reading stored posts", error);
-    return [];
-  }
-}
-
 export default function PostPage() {
-  const [posts, setPosts] = useState(getStoredPosts());
+  const [posts, setPosts] = useState([]);
+  const [loading, setLoading] = useState(true);
+  const [submitting, setSubmitting] = useState(false);
   const [form, setForm] = useState({
     user: "",
     handle: "",
@@ -129,6 +54,28 @@ export default function PostPage() {
   });
   const [fileKey, setFileKey] = useState(0);
   const [toasts, setToasts] = useState([]);
+
+  useEffect(() => {
+    let cancelled = false;
+    const load = async () => {
+      try {
+        const response = await fetch("/api/posts", { cache: "no-store" });
+        const data = await response.json();
+        if (!cancelled) setPosts(data.posts || []);
+      } catch (error) {
+        console.error("Error loading posts", error);
+        if (!cancelled) {
+          addToast("Could not load posts right now.");
+        }
+      } finally {
+        if (!cancelled) setLoading(false);
+      }
+    };
+    load();
+    return () => {
+      cancelled = true;
+    };
+  }, []);
 
   const addToast = (message) => {
     const id =
@@ -154,44 +101,55 @@ export default function PostPage() {
     reader.readAsDataURL(file);
   };
 
-  const handleSubmit = (e) => {
+  const handleSubmit = async (e) => {
     e.preventDefault();
     if (!form.user || !form.title || !form.content) {
       addToast("Please add your name, title, and story before posting.");
       return;
     }
-    const hashtag =
-      form.handle && form.handle.startsWith("#")
-        ? form.handle
-        : form.handle
-        ? `#${form.handle}`
-        : `#${form.user.toLowerCase().replace(/\s+/g, "")}`;
-    const newPost = {
-      id:
-        typeof crypto !== "undefined" && crypto.randomUUID
-          ? crypto.randomUUID()
-          : `${Date.now()}`,
-      user: form.user,
-      handle: hashtag,
-      title: form.title,
-      content: form.content,
-      mood: form.mood,
-      time: "Just now",
-      photo: form.photoData,
-    };
-    const nextPosts = [newPost, ...posts];
-    setPosts(nextPosts);
-    savePosts(nextPosts);
-    addToast("Your post was added. Check Home to see it live.");
-    setForm({
-      user: "",
-      handle: "",
-      title: "",
-      content: "",
-      mood: "Community",
-      photoData: "",
-    });
-    setFileKey((k) => k + 1);
+    setSubmitting(true);
+    try {
+      const response = await fetch("/api/posts", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify(form),
+      });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to publish your post.");
+      }
+      setPosts((prev) => [data.post, ...prev]);
+      addToast("Your post was added. Check Home to see it live.");
+      setForm({
+        user: "",
+        handle: "",
+        title: "",
+        content: "",
+        mood: "Community",
+        photoData: "",
+      });
+      setFileKey((k) => k + 1);
+    } catch (error) {
+      console.error("Error posting update", error);
+      addToast(error.message || "Unable to publish right now.");
+    } finally {
+      setSubmitting(false);
+    }
+  };
+
+  const handleDelete = async (post) => {
+    try {
+      const response = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+      const data = await response.json();
+      if (!response.ok) {
+        throw new Error(data.error || "Failed to delete post.");
+      }
+      setPosts((prev) => prev.filter((item) => item.id !== post.id));
+      addToast("Post deleted.");
+    } catch (error) {
+      console.error("Error deleting post", error);
+      addToast(error.message || "Could not delete this post.");
+    }
   };
 
   return (
@@ -207,7 +165,7 @@ export default function PostPage() {
             </p>
             <h1 className="text-3xl font-bold text-slate-900">Create a new post</h1>
             <p className="text-sm text-slate-600">
-              Fill in the details and publish. Your post will appear on Home once submitted.
+              Fill in the details and publish. Your post will appear on Home once submitted and is stored in Cloudinary.
             </p>
           </div>
 
@@ -309,9 +267,10 @@ export default function PostPage() {
 
             <button
               type="submit"
-              className="w-full rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700"
+              disabled={submitting}
+              className="w-full rounded-xl bg-emerald-600 px-5 py-3 text-sm font-semibold text-white shadow-sm transition hover:bg-emerald-700 disabled:cursor-not-allowed disabled:opacity-70"
             >
-              Publish post
+              {submitting ? "Publishing..." : "Publish post"}
             </button>
           </form>
         </section>
@@ -323,14 +282,16 @@ export default function PostPage() {
               Also visible on Home
             </span>
           </div>
-          {posts.length === 0 ? (
+          {loading ? (
+            <p className="text-sm text-slate-500">Loading posts…</p>
+          ) : posts.length === 0 ? (
             <p className="text-sm text-slate-500">
               No posts yet. Publish using the form above.
             </p>
           ) : (
             <div className="grid grid-cols-1 gap-5">
               {posts.map((post) => (
-                <SocialCard key={post.id} post={post} />
+                <SocialCard key={post.id} post={post} onDelete={handleDelete} />
               ))}
             </div>
           )}
