@@ -38,7 +38,7 @@ export function NavBar() {
         >
           {link.label}
           {link.label === "Mail" && unreadCount > 0 && (
-            <span className="inline-flex items-center justify-center bg-red-600 text-white text-xs font-bold rounded-full px-2 py-0.5">
+            <span>
               {unreadCount}
             </span>
           )}
