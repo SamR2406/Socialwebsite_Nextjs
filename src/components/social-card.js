@@ -45,7 +45,7 @@ function Avatar({ name }) {
   );
 }
 
-export function SocialCard({ post, onDelete }) {
+export function SocialCard({ post, onDelete, disabled = false }) {
   const tone = moodTone[post.mood] || "bg-slate-50 text-slate-700 border-slate-200";
   const displayTime = formatTime(post.createdAt || post.time);
 
@@ -77,9 +77,13 @@ export function SocialCard({ post, onDelete }) {
           <button
             type="button"
             onClick={() => onDelete(post)}
-            className="rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600"
+            disabled={disabled}
+            className={classNames(
+              "rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600",
+              disabled ? "cursor-not-allowed opacity-60 hover:bg-white hover:text-slate-500" : ""
+            )}
           >
-            Delete
+            {disabled ? "Deleting…" : "Delete"}
           </button>
         ) : null}
       </div>
