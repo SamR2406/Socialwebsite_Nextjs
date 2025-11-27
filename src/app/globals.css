@@ -28,6 +28,8 @@ header span {
 
 main li {
   background: none;
+}
+
 @keyframes barrel-roll {
   0% {
     transform: rotate(0deg);

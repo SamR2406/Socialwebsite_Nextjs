@@ -5,15 +5,15 @@ import { messages as initialMessages } from "../app/messages";
 const MessagesContext = createContext();
 
 export function MessagesProvider({ children }) {
-  const [messages, setMessages] = useState(initialMessages);
+  const [messages, setMessages] = useState(() => {
+    if (typeof window !== "undefined") {
+      const stored = localStorage.getItem("messages");
+      if (stored) return JSON.parse(stored);
+    }
+    return initialMessages;
+  });
 
-  // Load from localStorage
-  useEffect(() => {
-    const stored = localStorage.getItem("messages");
-    if (stored) setMessages(JSON.parse(stored));
-  }, []);
-
-  // Save to localStorage
+  // Save to localStorage when messages change
   useEffect(() => {
     localStorage.setItem("messages", JSON.stringify(messages));
   }, [messages]);
