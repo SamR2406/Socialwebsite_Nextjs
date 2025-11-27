@@ -55,7 +55,11 @@ function PostsFeed() {
       <div className="space-y-2 text-sm text-slate-600">
         <p>No posts yet.</p>
         <p>
-          Head to the <a className="font-semibold text-emerald-700" href="/post">Post</a> tab to publish your first update.
+          Head to the{" "}
+          <a className="font-semibold text-emerald-700" href="/post">
+            Post
+          </a>{" "}
+          tab to publish your first update.
         </p>
       </div>
     );
@@ -75,10 +79,14 @@ function PostsFeed() {
               setError("");
               setDeletingId(post.id);
               try {
-                const response = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+                const response = await fetch(`/api/posts/${post.id}`, {
+                  method: "DELETE",
+                });
                 const data = await response.json();
                 if (response.status === 404) {
-                  setPosts((prev) => prev.filter((item) => item.id !== post.id));
+                  setPosts((prev) =>
+                    prev.filter((item) => item.id !== post.id)
+                  );
                   setStatus("That post was already removed.");
                   return;
                 }
