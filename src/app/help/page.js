@@ -1,10 +1,31 @@
 "use client";
 
+import { useEffect, useRef, useState } from "react";
 import { Card } from "@/components/ui/card";
 import { SplineScene } from "@/components/ui/splite";
 import { Spotlight } from "@/components/ui/spotlight";
 
 export default function HelpPage() {
+  const [rolling, setRolling] = useState(false);
+  const rollTimer = useRef(null);
+
+  useEffect(() => {
+    return () => {
+      if (rollTimer.current) clearTimeout(rollTimer.current);
+      document.documentElement.classList.remove("barrel-roll-active");
+    };
+  }, []);
+
+  const triggerRoll = () => {
+    setRolling(true);
+    document.documentElement.classList.add("barrel-roll-active");
+    if (rollTimer.current) clearTimeout(rollTimer.current);
+    rollTimer.current = setTimeout(() => {
+      document.documentElement.classList.remove("barrel-roll-active");
+      setRolling(false);
+    }, 1100);
+  };
+
   return (
     <div className="min-h-screen bg-slate-100 text-slate-900">
       <div className="mx-auto max-w-5xl px-5 pb-16 pt-10 sm:px-8">
@@ -30,17 +51,24 @@ export default function HelpPage() {
                 Interactive 3D
               </h2>
               <p className="mt-4 max-w-lg text-neutral-300">
-                Bring your UI to life with beautiful 3D scenes. Create immersive experiences
-                that capture attention and enhance your design.
+                The helping robot can help you while you explore the scene. Use the tabs above to
+                reach the right page or drop us a note if you need anything.
               </p>
               <p className="mt-3 text-sm text-neutral-400">
-                This embed uses the Splite component you shared.
+                Page under construction :)
               </p>
             </div>
             <div className="relative flex-1">
               <SplineScene
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
-                className="h-full w-full"
+                className={`h-full w-full ${rolling ? "animate-[barrel-roll_1s_ease-in-out]" : ""}`}
+              />
+              <button
+                type="button"
+                aria-label="Do a barrel roll"
+                onClick={triggerRoll}
+                className="absolute inset-0 z-10 cursor-pointer bg-transparent"
+                title="Click the robot"
               />
             </div>
           </div>
