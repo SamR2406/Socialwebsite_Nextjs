@@ -23,6 +23,8 @@ function PostsFeed() {
   const [posts, setPosts] = useState([]);
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState("");
+  const [status, setStatus] = useState("");
+  const [deletingId, setDeletingId] = useState("");
 
   useEffect(() => {
     let cancelled = false;
@@ -48,10 +50,6 @@ function PostsFeed() {
     return <p className="text-sm text-slate-500">Loading posts…</p>;
   }
 
-  if (error) {
-    return <p className="text-sm text-rose-600">{error}</p>;
-  }
-
   if (posts.length === 0) {
     return (
       <div className="space-y-2 text-sm text-slate-600">
@@ -64,10 +62,42 @@ function PostsFeed() {
   }
 
   return (
-    <div className="grid grid-cols-1 gap-5">
-      {posts.map((post) => (
-        <SocialCard key={post.id} post={post} />
-      ))}
-    </div>
+    <>
+      {status ? <p className="mb-2 text-sm text-slate-500">{status}</p> : null}
+      {error ? <p className="mb-2 text-sm text-rose-600">{error}</p> : null}
+      <div className="grid grid-cols-1 gap-5">
+        {posts.map((post) => (
+          <SocialCard
+            key={post.id}
+            post={post}
+            onDelete={async () => {
+              setStatus("");
+              setError("");
+              setDeletingId(post.id);
+              try {
+                const response = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+                const data = await response.json();
+                if (response.status === 404) {
+                  setPosts((prev) => prev.filter((item) => item.id !== post.id));
+                  setStatus("That post was already removed.");
+                  return;
+                }
+                if (!response.ok) {
+                  throw new Error(data.error || "Failed to delete post.");
+                }
+                setPosts((prev) => prev.filter((item) => item.id !== post.id));
+                setStatus("Post deleted.");
+              } catch (err) {
+                console.error("Error deleting post", err);
+                setError(err.message || "Could not delete this post.");
+              } finally {
+                setDeletingId("");
+              }
+            }}
+            disabled={deletingId === post.id}
+          />
+        ))}
+      </div>
+    </>
   );
 }
