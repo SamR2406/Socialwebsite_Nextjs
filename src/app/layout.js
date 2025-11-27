@@ -1,6 +1,7 @@
 import { Manrope } from "next/font/google";
 import "./globals.css";
 import { NavBar } from "@/components/nav-bar";
+import { MessagesProvider } from "../context/MessagesContext";
 
 const manrope = Manrope({
   variable: "--font-body",
@@ -17,15 +18,17 @@ export default function RootLayout({ children }) {
   return (
     <html lang="en">
       <body className={`${manrope.variable} antialiased`}>
-        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
-          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
-            <a href="/" className="text-lg font-semibold text-slate-900">
-              Social Stream
-            </a>
-            <NavBar />
-          </div>
-        </header>
-        <main>{children}</main>
+        <MessagesProvider>
+          <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+            <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
+              <a href="/" className="text-lg font-semibold text-slate-900">
+                Social Stream
+              </a>
+              <NavBar />
+            </div>
+          </header>
+          <main>{children}</main>
+        </MessagesProvider>
       </body>
     </html>
   );

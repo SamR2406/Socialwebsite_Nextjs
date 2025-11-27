@@ -19,3 +19,13 @@ body {
   color: var(--foreground);
   font-family: var(--font-body), "Manrope", system-ui, -apple-system, sans-serif;
 }
+
+header span {
+  background: red;
+  padding: 1px 6px 1px 6px;
+  margin-left: 5px;
+}
+
+main li {
+  background: none;
+}
