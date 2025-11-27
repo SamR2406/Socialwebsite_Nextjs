@@ -1,4 +1,5 @@
 import { Manrope } from "next/font/google";
+import Link from "next/link";
 import "./globals.css";
 import { NavBar } from "@/components/nav-bar";
 import { MessagesProvider } from "../context/MessagesContext";
@@ -29,6 +30,15 @@ export default function RootLayout({ children }) {
           </header>
           <main>{children}</main>
         </MessagesProvider>
+        <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+          <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
+            <Link href="/" className="text-lg font-semibold text-slate-900">
+              Social Stream
+            </Link>
+            <NavBar />
+          </div>
+        </header>
+        <main>{children}</main>
       </body>
     </html>
   );
