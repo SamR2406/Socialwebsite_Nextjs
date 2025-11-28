@@ -1,7 +1,5 @@
 "use client";
 
-
-
 import { useEffect, useState } from "react";
 import { SocialCard } from "@/components/social-card";
 
@@ -139,7 +137,9 @@ export default function PostPage() {
 
   const handleDelete = async (post) => {
     try {
-      const response = await fetch(`/api/posts/${post.id}`, { method: "DELETE" });
+      const response = await fetch(`/api/posts/${post.id}`, {
+        method: "DELETE",
+      });
       const data = await response.json();
       if (!response.ok) {
         throw new Error(data.error || "Failed to delete post.");
@@ -163,16 +163,21 @@ export default function PostPage() {
             <p className="text-xs font-semibold uppercase tracking-[0.18em] text-emerald-600">
               Post
             </p>
-            <h1 className="text-3xl font-bold text-slate-900">Create a new post</h1>
+            <h1 className="text-3xl font-bold text-slate-900">
+              Create a new post
+            </h1>
             <p className="text-sm text-slate-600">
-              Fill in the details and publish. Your post will appear on Home once submitted and is stored in Cloudinary.
+              Fill in the details and publish. Your post will appear on Home
+              once submitted and is stored in Cloudinary.
             </p>
           </div>
 
           <form onSubmit={handleSubmit} className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Display name</label>
+                <label className="text-sm font-semibold text-slate-700">
+                  Display name
+                </label>
                 <input
                   type="text"
                   value={form.user}
@@ -184,7 +189,9 @@ export default function PostPage() {
                 />
               </div>
               <div className="space-y-2">
-                <label className="text-sm font-semibold text-slate-700">Hashtag (optional)</label>
+                <label className="text-sm font-semibold text-slate-700">
+                  Hashtag (optional)
+                </label>
                 <input
                   type="text"
                   value={form.handle}
@@ -198,7 +205,9 @@ export default function PostPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Photo (optional)</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Photo (optional)
+              </label>
               <input
                 key={fileKey}
                 type="file"
@@ -213,13 +222,17 @@ export default function PostPage() {
                     alt="Preview"
                     className="h-12 w-12 rounded-full object-cover ring-2 ring-emerald-200"
                   />
-                  <p className="text-sm font-semibold text-slate-700">Preview ready</p>
+                  <p className="text-sm font-semibold text-slate-700">
+                    Preview ready
+                  </p>
                 </div>
               ) : null}
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Title</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Title
+              </label>
               <input
                 type="text"
                 value={form.title}
@@ -232,7 +245,9 @@ export default function PostPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Story</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Story
+              </label>
               <textarea
                 rows={4}
                 value={form.content}
@@ -245,7 +260,9 @@ export default function PostPage() {
             </div>
 
             <div className="space-y-2">
-              <label className="text-sm font-semibold text-slate-700">Mood</label>
+              <label className="text-sm font-semibold text-slate-700">
+                Mood
+              </label>
               <div className="grid grid-cols-2 gap-3 sm:grid-cols-4">
                 {["Community", "Advice", "Lifestyle", "Update"].map((mood) => (
                   <button

@@ -29,14 +29,11 @@ async function saveJson(publicId, payload) {
   const encoded = Buffer.from(JSON.stringify(payload, null, 2)).toString(
     "base64"
   );
-  await cloudinary.uploader.upload(
-    `data:application/json;base64,${encoded}`,
-    {
-      resource_type: "raw",
-      public_id: publicId,
-      overwrite: true,
-    }
-  );
+  await cloudinary.uploader.upload(`data:application/json;base64,${encoded}`, {
+    resource_type: "raw",
+    public_id: publicId,
+    overwrite: true,
+  });
   return payload;
 }
 
