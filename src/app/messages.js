@@ -1,3 +1,30 @@
+export const users = [
+  {
+    id: 1,
+    name: "John",
+    profilePic: "./img/pfp1.jpg", // path or URL to profile picture
+    bio: "Tech enthusiast and coder. Loves exploring new tools and contributing to open source.",
+  },
+  {
+    id: 2,
+    name: "Hannah",
+    profilePic: "./img/pfp2.jpg",
+    bio: "Digital artist experimenting with generative AI. Passionate about collaboration and creative coding.",
+  },
+  {
+    id: 3,
+    name: "Lory",
+    profilePic: "./img/pfp3.jpg",
+    bio: "Frontend developer learning TypeScript. Always chasing bugs and sharing coding humor.",
+  },
+  {
+    id: 4,
+    name: "Alfie",
+    profilePic: "./img/pfp4.jpg",
+    bio: "Amazing Bootcamp lecturer focused on teaching, productivity, and healthy coding habits.",
+  },
+];
+
 export const messages = [
   {
     id: 1,
