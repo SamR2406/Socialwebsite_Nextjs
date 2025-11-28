@@ -23,24 +23,32 @@ export default function Messages() {
           .map((msg) => (
             <li
               key={msg.id}
-              className={`border-b py-3 ${msg.isRead ? "bg-gray-50" : "bg-blue-200"}`}
+              className={`border-b py-3 pl-4 ${
+                msg.isRead ? "bg-gray-50" : "bg-blue-200"
+              }`}
+              style={
+                !msg.isRead
+                  ? { borderLeft: "1rem solid #bfdbfe", paddingLeft: "1rem" }
+                  : undefined
+              }
             >
-            <div className="flex justify-between items-center">
-              <h3 className="font-semibold text-gray-400">{msg.title}</h3>
-              <span className="text-sm text-gray-500">{msg.date}</span>
-            </div>
-            <p className="text-gray-700 mt-1">{msg.message}</p>
-            <p className="text-xs text-gray-400 mt-1">From: {msg.from}</p>
-            {!msg.isRead && (
-              <button
-                onClick={() => markAsRead(msg.id)}
-                className="mt-2 text-sm text-blue-600 hover:underline"
-              >
-                Mark as read
-              </button>
-            )}
-          </li>
-        ))}
+              <div className="flex justify-between items-center">
+                <h3 className="font-semibold text-gray-400">{msg.title}</h3>
+                <span className="text-sm text-gray-500">{msg.date}</span>
+              </div>
+              <p className="text-lg text-gray-400 mt-1">From: {msg.from}</p>
+              <p className="text-gray-700 mt-1">{msg.message}</p>
+
+              {!msg.isRead && (
+                <button
+                  onClick={() => markAsRead(msg.id)}
+                  className="mt-2 text-sm text-blue-600 hover:underline"
+                >
+                  Mark as read
+                </button>
+              )}
+            </li>
+          ))}
       </ul>
     </div>
   );

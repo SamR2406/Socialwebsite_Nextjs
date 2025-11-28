@@ -7,6 +7,7 @@ import { useMessages } from "../context/MessagesContext";
 const links = [
   { href: "/", label: "Home" },
   { href: "/post", label: "Post" },
+  { href: "/feed", label: "Feed" },
   { href: "/chat", label: "Chat" },
   { href: "/messages", label: "Mail" },
   { href: "/profile", label: "Profile" },
@@ -38,9 +39,7 @@ export function NavBar() {
         >
           {link.label}
           {link.label === "Mail" && unreadCount > 0 && (
-            <span>
-              {unreadCount}
-            </span>
+            <span>{unreadCount}</span>
           )}
         </Link>
       ))}

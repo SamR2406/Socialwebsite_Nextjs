@@ -1,6 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
+"use client";
 
-import { useMemo } from "react";
+import { useMemo, useEffect, useState } from "react";
 
 const moodTone = {
   Community: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -24,7 +25,8 @@ function formatTime(value) {
   return date.toLocaleDateString(undefined, {
     month: "short",
     day: "numeric",
-    year: date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
+    year:
+      date.getFullYear() !== new Date().getFullYear() ? "numeric" : undefined,
   });
 }
 
@@ -46,8 +48,42 @@ function Avatar({ name }) {
 }
 
 export function SocialCard({ post, onDelete, disabled = false }) {
-  const tone = moodTone[post.mood] || "bg-slate-50 text-slate-700 border-slate-200";
+  const tone =
+    moodTone[post.mood] || "bg-slate-50 text-slate-700 border-slate-200";
   const displayTime = formatTime(post.createdAt || post.time);
+
+  const [liked, setLiked] = useState(false);
+
+  useEffect(() => {
+    try {
+      const raw = localStorage.getItem("likedPosts");
+      if (!raw) return setLiked(false);
+      const arr = JSON.parse(raw);
+      const exists = arr.some((p) => p.id === post.id);
+      setLiked(Boolean(exists));
+    } catch (e) {
+      setLiked(false);
+    }
+  }, [post.id]);
+
+  const toggleLike = () => {
+    try {
+      const raw = localStorage.getItem("likedPosts");
+      const arr = raw ? JSON.parse(raw) : [];
+      const exists = arr.find((p) => p.id === post.id);
+      let next;
+      if (exists) {
+        next = arr.filter((p) => p.id !== post.id);
+      } else {
+        // store the post snapshot
+        next = [{ ...post }, ...arr];
+      }
+      localStorage.setItem("likedPosts", JSON.stringify(next));
+      setLiked(!exists);
+    } catch (e) {
+      console.error("Error toggling like", e);
+    }
+  };
 
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
@@ -63,8 +99,15 @@ export function SocialCard({ post, onDelete, disabled = false }) {
         )}
         <div className="flex-1 space-y-1">
           <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold text-slate-900">{post.title}</h3>
-            <span className={classNames("rounded-full border px-3 py-1 text-xs font-medium", tone)}>
+            <h3 className="text-lg font-semibold text-slate-900">
+              {post.title}
+            </h3>
+            <span
+              className={classNames(
+                "rounded-full border px-3 py-1 text-xs font-medium",
+                tone
+              )}
+            >
               {post.mood}
             </span>
           </div>
@@ -73,21 +116,39 @@ export function SocialCard({ post, onDelete, disabled = false }) {
           </p>
           <p className="text-xs text-slate-400">{displayTime}</p>
         </div>
-        {onDelete ? (
+        <div className="flex flex-col gap-2 items-end">
           <button
             type="button"
-            onClick={() => onDelete(post)}
-            disabled={disabled}
+            onClick={toggleLike}
             className={classNames(
-              "rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600",
-              disabled ? "cursor-not-allowed opacity-60 hover:bg-white hover:text-slate-500" : ""
+              "rounded-full px-3 py-1 text-xs font-semibold transition",
+              liked
+                ? "bg-red-50 text-rose-600 border border-rose-100"
+                : "text-slate-500 hover:bg-slate-100 border border-transparent"
             )}
           >
-            {disabled ? "Deleting…" : "Delete"}
+            {liked ? "♥ Liked" : "♡ Like"}
           </button>
-        ) : null}
+          {onDelete ? (
+            <button
+              type="button"
+              onClick={() => onDelete(post)}
+              disabled={disabled}
+              className={classNames(
+                "rounded-full border border-slate-200 px-3 py-1 text-xs font-semibold text-slate-500 transition hover:border-rose-200 hover:bg-rose-50 hover:text-rose-600",
+                disabled
+                  ? "cursor-not-allowed opacity-60 hover:bg-white hover:text-slate-500"
+                  : ""
+              )}
+            >
+              {disabled ? "Deleting…" : "Delete"}
+            </button>
+          ) : null}
+        </div>
       </div>
-      <p className="mt-4 text-base leading-relaxed text-slate-700">{post.content}</p>
+      <p className="mt-4 text-base leading-relaxed text-slate-700">
+        {post.content}
+      </p>
     </article>
   );
 }
