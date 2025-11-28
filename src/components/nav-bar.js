@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { useEffect, useState } from "react";
 import { useMessages } from "../context/MessagesContext";
 
 const links = [
@@ -15,9 +16,16 @@ const links = [
 ];
 
 export function NavBar() {
+  const [mounted, setMounted] = useState(false);
   const pathname = usePathname();
 
   const { unreadCount } = useMessages();
+
+  useEffect(() => {
+    // We only use this to avoid hydration mismatch; safe to set once on mount
+    // eslint-disable-next-line react-hooks/set-state-in-effect
+    setMounted(true);
+  }, []);
 
   const isActive = (href) => {
     if (href === "/") return pathname === "/";
@@ -39,7 +47,9 @@ export function NavBar() {
         >
           {link.label}
           {link.label === "Mail" && unreadCount > 0 && (
-            <span>{unreadCount}</span>
+            <span>
+              {unreadCount}
+            </span>
           )}
         </Link>
       ))}

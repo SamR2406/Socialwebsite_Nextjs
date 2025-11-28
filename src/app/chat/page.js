@@ -1,3 +1,9 @@
+import React from "react";
+import firebase from 'firebase/app';
+
+import {useAuthState} from 'react-firebase-hooks/auth';
+import {useCollectionData} from 'react-firebase-hooks/firestore';
+
 "use client";
 
 export default function ChatPage() {
@@ -10,5 +16,6 @@ export default function ChatPage() {
         </p>
       </div>
     </div>
-  );
+  )
+  
 }

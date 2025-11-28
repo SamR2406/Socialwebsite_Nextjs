@@ -63,13 +63,15 @@ export default function HelpPage() {
                 scene="https://prod.spline.design/kZDDjO5HuC9GJUM2/scene.splinecode"
                 className={`h-full w-full ${rolling ? "animate-[barrel-roll_1s_ease-in-out]" : ""}`}
               />
-              <button
-                type="button"
-                aria-label="Do a barrel roll"
-                onClick={triggerRoll}
-                className="absolute inset-0 z-10 cursor-pointer bg-transparent"
-                title="Click the robot"
-              />
+              <div className="pointer-events-none absolute inset-0 z-10 flex items-center justify-center">
+                <button
+                  type="button"
+                  aria-label="Do a barrel roll"
+                  onClick={triggerRoll}
+                  className="pointer-events-auto h-24 w-24 rounded-full bg-transparent"
+                  title="Click the robot"
+                />
+              </div>
             </div>
           </div>
         </Card>
