@@ -46,7 +46,7 @@ export function NavBar() {
           ].join(" ")}
         >
           {link.label}
-          {link.label === "Mail" && unreadCount > 0 && (
+          {link.label === "Mail" && mounted && unreadCount > 0 && (
             <span>
               {unreadCount}
             </span>

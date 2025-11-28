@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { SocialCard } from "@/components/social-card";
 
 export const metadata = {
@@ -8,17 +8,16 @@ export const metadata = {
 };
 
 export default function LikedPage() {
-  const [liked, setLiked] = useState([]);
-
-  useEffect(() => {
+  const [liked, setLiked] = useState(() => {
     try {
-      const raw = localStorage.getItem("likedPosts");
-      if (!raw) return setLiked([]);
-      setLiked(JSON.parse(raw));
+      const raw =
+        typeof window !== "undefined" ? localStorage.getItem("likedPosts") : null;
+      if (!raw) return [];
+      return JSON.parse(raw);
     } catch (e) {
-      setLiked([]);
+      return [];
     }
-  }, []);
+  });
 
   if (liked.length === 0) {
     return (

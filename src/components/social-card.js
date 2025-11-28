@@ -1,7 +1,7 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import { useMemo, useEffect, useState } from "react";
+import { useMemo, useState } from "react";
 
 const moodTone = {
   Community: "bg-emerald-50 text-emerald-700 border-emerald-100",
@@ -52,19 +52,18 @@ export function SocialCard({ post, onDelete, disabled = false }) {
     moodTone[post.mood] || "bg-slate-50 text-slate-700 border-slate-200";
   const displayTime = formatTime(post.createdAt || post.time);
 
-  const [liked, setLiked] = useState(false);
-
-  useEffect(() => {
+  const [liked, setLiked] = useState(() => {
     try {
-      const raw = localStorage.getItem("likedPosts");
-      if (!raw) return setLiked(false);
+      const raw =
+        typeof window !== "undefined" ? localStorage.getItem("likedPosts") : null;
+      if (!raw) return false;
       const arr = JSON.parse(raw);
       const exists = arr.some((p) => p.id === post.id);
-      setLiked(Boolean(exists));
+      return Boolean(exists);
     } catch (e) {
-      setLiked(false);
+      return false;
     }
-  }, [post.id]);
+  });
 
   const toggleLike = () => {
     try {
