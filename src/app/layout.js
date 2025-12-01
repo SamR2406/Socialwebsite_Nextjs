@@ -11,7 +11,7 @@ const manrope = Manrope({
 });
 
 export const metadata = {
-  title: "Social Stream | Social Feed",
+  title: "Sheffgram | Social Feed",
   description: "Share updates, add posts, and stay connected.",
 };
 
@@ -20,15 +20,15 @@ export default function RootLayout({ children }) {
     <html lang="en">
       <body className={`${manrope.variable} antialiased`}>
         <MessagesProvider>
-          <header className="sticky top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
+          <header className="fixed inset-x-0 top-0 z-40 border-b border-slate-200 bg-white/90 backdrop-blur">
             <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
               <Link href="/" className="text-lg font-semibold text-slate-900">
-                Social Stream
+                Sheffgram
               </Link>
               <NavBar />
             </div>
           </header>
-          <main>{children}</main>
+          <main className="pt-20 sm:pt-24">{children}</main>
         </MessagesProvider>
       </body>
     </html>

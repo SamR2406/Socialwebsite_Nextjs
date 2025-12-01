@@ -87,36 +87,38 @@ export function SocialCard({ post, onDelete, disabled = false }) {
 
   return (
     <article className="rounded-2xl border border-slate-200 bg-white p-5 shadow-sm">
-      <div className="flex items-start gap-4">
-        {post.photo ? (
-          <img
-            src={post.photo}
-            alt={post.user}
-            className="h-11 w-11 rounded-full object-cover ring-2 ring-emerald-200"
-          />
-        ) : (
-          <Avatar name={post.user} />
-        )}
-        <div className="flex-1 space-y-1">
-          <div className="flex flex-wrap items-center gap-2">
-            <h3 className="text-lg font-semibold text-slate-900">
-              {post.title}
-            </h3>
-            <span
-              className={classNames(
-                "rounded-full border px-3 py-1 text-xs font-medium",
-                tone
-              )}
-            >
-              {post.mood}
-            </span>
+      <div className="flex flex-col gap-3 sm:flex-row sm:items-start sm:gap-4">
+        <div className="flex flex-1 items-start gap-3">
+          {post.photo ? (
+            <img
+              src={post.photo}
+              alt={post.user}
+              className="h-11 w-11 flex-shrink-0 rounded-full object-cover ring-2 ring-emerald-200"
+            />
+          ) : (
+            <Avatar name={post.user} />
+          )}
+          <div className="flex-1 space-y-1">
+            <div className="flex flex-wrap items-center gap-2">
+              <h3 className="text-lg font-semibold text-slate-900 break-words">
+                {post.title}
+              </h3>
+              <span
+                className={classNames(
+                  "rounded-full border px-3 py-1 text-xs font-medium",
+                  tone
+                )}
+              >
+                {post.mood}
+              </span>
+            </div>
+            <p className="text-sm text-slate-600">
+              {post.user} <span className="text-slate-400">{post.handle}</span>
+            </p>
+            <p className="text-xs text-slate-400">{displayTime}</p>
           </div>
-          <p className="text-sm text-slate-600">
-            {post.user} <span className="text-slate-400">{post.handle}</span>
-          </p>
-          <p className="text-xs text-slate-400">{displayTime}</p>
         </div>
-        <div className="flex flex-col gap-2 items-end">
+        <div className="flex w-full items-center justify-end gap-2 sm:w-auto sm:flex-col sm:items-end">
           <button
             type="button"
             onClick={toggleLike}
@@ -126,9 +128,9 @@ export function SocialCard({ post, onDelete, disabled = false }) {
                 ? "bg-red-50 text-rose-600 border border-rose-100"
                 : "text-slate-500 hover:bg-slate-100 border border-transparent"
             )}
-          >
-            {liked ? "♥ Liked" : "♡ Like"}
-          </button>
+            >
+              {liked ? "♥ Liked" : "♡ Like"}
+            </button>
           {onDelete ? (
             <button
               type="button"
@@ -146,7 +148,7 @@ export function SocialCard({ post, onDelete, disabled = false }) {
           ) : null}
         </div>
       </div>
-      <p className="mt-4 text-base leading-relaxed text-slate-700">
+      <p className="mt-4 text-base leading-relaxed text-slate-700 break-words">
         {post.content}
       </p>
     </article>

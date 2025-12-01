@@ -1,7 +1,7 @@
 import Messages from "@/components/Messages";
 
 export const metadata = {
-  title: "Mail | Social Stream",
+  title: "Mail | Sheffgram",
 };
 
 export default function MessagesPage() {

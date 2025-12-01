@@ -184,7 +184,7 @@ export default function PostPage() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, user: e.target.value }))
                   }
-                  placeholder="Lena Park"
+                  placeholder="Peter Parker"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none ring-emerald-200 transition focus:border-emerald-400 focus:bg-white focus:ring-2"
                 />
               </div>
@@ -198,7 +198,7 @@ export default function PostPage() {
                   onChange={(e) =>
                     setForm((f) => ({ ...f, handle: e.target.value }))
                   }
-                  placeholder="#lenapark"
+                  placeholder="#peterparker"
                   className="w-full rounded-xl border border-slate-200 bg-slate-50 px-4 py-3 text-sm text-slate-900 outline-none ring-emerald-200 transition focus:border-emerald-400 focus:bg-white focus:ring-2"
                 />
               </div>
