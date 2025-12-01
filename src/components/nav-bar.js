@@ -34,7 +34,7 @@ export function NavBar() {
   };
 
   return (
-    <nav className="flex gap-3 text-sm font-semibold">
+    <nav className="flex gap-3 overflow-x-auto whitespace-nowrap text-sm font-semibold sm:flex-wrap">
       {links.map((link) => (
         <Link
           key={link.href}

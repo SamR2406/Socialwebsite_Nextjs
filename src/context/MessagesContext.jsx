@@ -5,18 +5,28 @@ import { messages as initialMessages } from "../app/messages";
 const MessagesContext = createContext();
 
 export function MessagesProvider({ children }) {
-  const [messages, setMessages] = useState(() => {
-    if (typeof window !== "undefined") {
-      const stored = localStorage.getItem("messages");
-      if (stored) return JSON.parse(stored);
+  const [messages, setMessages] = useState(initialMessages);
+  const [isHydrated, setIsHydrated] = useState(false);
+
+  // Load any stored messages on the client after first render to avoid SSR/CSR mismatch
+  useEffect(() => {
+    const stored = localStorage.getItem("messages");
+    if (stored) {
+      try {
+        setMessages(JSON.parse(stored));
+      } catch (err) {
+        console.warn("Failed to parse stored messages", err);
+      }
     }
-    return initialMessages;
-  });
+    setIsHydrated(true);
+  }, []);
 
   // Save to localStorage when messages change
   useEffect(() => {
-    localStorage.setItem("messages", JSON.stringify(messages));
-  }, [messages]);
+    if (isHydrated) {
+      localStorage.setItem("messages", JSON.stringify(messages));
+    }
+  }, [messages, isHydrated]);
 
   const unreadCount = messages.filter((m) => !m.isRead).length;
 
