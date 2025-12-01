@@ -3,10 +3,6 @@
 import { useEffect, useState } from "react";
 import { SocialCard } from "@/components/social-card";
 
-export const metadata = {
-  title: "Liked | Sheffgram",
-};
-
 export default function LikedPage() {
   const [liked, setLiked] = useState([]);
 
